@@ -151,7 +151,7 @@ g_messages_prefixed_init (void)
 
       initialized = TRUE;
       val = g_getenv ("G_MESSAGES_PREFIXED");
-      
+
       if (val)
 	{
 	  const GDebugKey keys[] = {
@@ -162,7 +162,7 @@ g_messages_prefixed_init (void)
 	    { "info", G_LOG_LEVEL_INFO },
 	    { "debug", G_LOG_LEVEL_DEBUG }
 	  };
-	  
+
 	  g_log_msg_prefix = g_parse_debug_string (val, keys, G_N_ELEMENTS (keys));
 	}
     }
@@ -172,7 +172,7 @@ static GLogDomain*
 g_log_find_domain_L (const gchar *log_domain)
 {
   register GLogDomain *domain;
-  
+
   domain = g_log_domains;
   while (domain)
     {
@@ -192,10 +192,10 @@ g_log_domain_new_L (const gchar *log_domain)
   domain->log_domain = g_strdup (log_domain);
   domain->fatal_mask = G_LOG_FATAL_MASK;
   domain->handlers = NULL;
-  
+
   domain->next = g_log_domains;
   g_log_domains = domain;
-  
+
   return domain;
 }
 
@@ -206,8 +206,8 @@ g_log_domain_check_free_L (GLogDomain *domain)
       domain->handlers == NULL)
     {
       register GLogDomain *last, *work;
-      
-      last = NULL;  
+
+      last = NULL;
 
       work = g_log_domains;
       while (work)
@@ -224,7 +224,7 @@ g_log_domain_check_free_L (GLogDomain *domain)
 	    }
 	  last = work;
 	  work = last->next;
-	}  
+	}
     }
 }
 
@@ -236,7 +236,7 @@ g_log_domain_get_handler_L (GLogDomain	*domain,
   if (domain && log_level)
     {
       register GLogHandler *handler;
-      
+
       handler = domain->handlers;
       while (handler)
 	{
@@ -281,22 +281,22 @@ g_log_set_fatal_mask (const gchar   *log_domain,
 {
   GLogLevelFlags old_flags;
   register GLogDomain *domain;
-  
+
   if (!log_domain)
     log_domain = "";
-  
+
   /* force errors to be fatal */
   fatal_mask |= G_LOG_LEVEL_ERROR;
   /* remove bogus flag */
   fatal_mask &= ~G_LOG_FLAG_FATAL;
-  
+
   g_mutex_lock (g_messages_lock);
 
   domain = g_log_find_domain_L (log_domain);
   if (!domain)
     domain = g_log_domain_new_L (log_domain);
   old_flags = domain->fatal_mask;
-  
+
   domain->fatal_mask = fatal_mask;
   g_log_domain_check_free_L (domain);
 
@@ -314,10 +314,10 @@ g_log_set_handler (const gchar	 *log_domain,
   static guint handler_id = 0;
   GLogDomain *domain;
   GLogHandler *handler;
-  
+
   g_return_val_if_fail ((log_levels & G_LOG_LEVEL_MASK) != 0, 0);
   g_return_val_if_fail (log_func != NULL, 0);
-  
+
   if (!log_domain)
     log_domain = "";
 
@@ -328,7 +328,7 @@ g_log_set_handler (const gchar	 *log_domain,
   domain = g_log_find_domain_L (log_domain);
   if (!domain)
     domain = g_log_domain_new_L (log_domain);
-  
+
   handler->id = ++handler_id;
   handler->log_level = log_levels;
   handler->log_func = log_func;
@@ -337,7 +337,7 @@ g_log_set_handler (const gchar	 *log_domain,
   domain->handlers = handler;
 
   g_mutex_unlock (g_messages_lock);
-  
+
   return handler_id;
 }
 
@@ -346,13 +346,13 @@ g_log_set_default_handler (GLogFunc log_func,
 			   gpointer user_data)
 {
   GLogFunc old_log_func;
-  
+
   g_mutex_lock (g_messages_lock);
   old_log_func = default_log_func;
   default_log_func = log_func;
   default_log_data = user_data;
   g_mutex_unlock (g_messages_lock);
-  
+
   return old_log_func;
 }
 
@@ -394,18 +394,18 @@ g_log_remove_handler (const gchar *log_domain,
 		      guint	   handler_id)
 {
   register GLogDomain *domain;
-  
+
   g_return_if_fail (handler_id > 0);
-  
+
   if (!log_domain)
     log_domain = "";
-  
+
   g_mutex_lock (g_messages_lock);
   domain = g_log_find_domain_L (log_domain);
   if (domain)
     {
       GLogHandler *work, *last;
-      
+
       last = NULL;
       work = domain->handlers;
       while (work)
@@ -416,7 +416,7 @@ g_log_remove_handler (const gchar *log_domain,
 		last->next = work->next;
 	      else
 		domain->handlers = work->next;
-	      g_log_domain_check_free_L (domain); 
+	      g_log_domain_check_free_L (domain);
 	      g_mutex_unlock (g_messages_lock);
 	      g_free (work);
 	      return;
@@ -424,7 +424,7 @@ g_log_remove_handler (const gchar *log_domain,
 	  last = work;
 	  work = last->next;
 	}
-    } 
+    }
   g_mutex_unlock (g_messages_lock);
   g_warning ("%s: could not find handler with id `%d' for domain \"%s\"",
 	     G_STRLOC, handler_id, log_domain);
@@ -540,7 +540,7 @@ g_logv (const gchar   *log_domain,
             {
 #ifdef G_OS_WIN32
 	      gchar *locale_msg = g_locale_from_utf8 (fatal_msg_buf, -1, NULL, NULL, NULL);
-	      
+
 	      MessageBox (NULL, locale_msg, NULL,
 			  MB_ICONERROR|MB_SETFOREGROUND);
 	      if (IsDebuggerPresent () && !(test_level & G_LOG_FLAG_RECURSION))
@@ -558,7 +558,7 @@ g_logv (const gchar   *log_domain,
 #endif /* !G_ENABLE_DEBUG || !SIGTRAP */
 #endif /* !G_OS_WIN32 */
 	    }
-	  
+
 	  depth--;
 	  g_private_set (g_log_depth, GUINT_TO_POINTER (depth));
 	}
@@ -572,7 +572,7 @@ g_log (const gchar   *log_domain,
        ...)
 {
   va_list args;
-  
+
   va_start (args, format);
   g_logv (log_domain, log_level, format, args);
   va_end (args);
@@ -620,11 +620,11 @@ g_assert_warning (const char *log_domain,
 {
   g_log (log_domain,
 	 G_LOG_LEVEL_ERROR,
-	 expression 
+	 expression
 	 ? "file %s: line %d (%s): assertion failed: (%s)"
 	 : "file %s: line %d (%s): should not be reached",
-	 file, 
-	 line, 
+	 file,
+	 line,
 	 pretty_function,
 	 expression);
   abort ();
@@ -633,7 +633,7 @@ g_assert_warning (const char *log_domain,
 #define CHAR_IS_SAFE(wc) (!((wc < 0x20 && wc != '\t' && wc != '\n' && wc != '\r') || \
 			    (wc == 0x7f) || \
 			    (wc >= 0x80 && wc < 0xa0)))
-     
+
 static gchar*
 strdup_convert (const gchar *string,
 		const gchar *charset)
@@ -652,13 +652,13 @@ strdup_convert (const gchar *string,
 	  else
 	    g_string_append_printf (gstring, "\\x%02x", (guint)(guchar)*p);
 	}
-      
+
       return g_string_free (gstring, FALSE);
     }
   else
     {
       GError *err = NULL;
-      
+
       gchar *result = g_convert_with_fallback (string, -1, charset, "UTF-8", "?", NULL, NULL, &err);
       if (result)
 	return result;
@@ -666,14 +666,14 @@ strdup_convert (const gchar *string,
 	{
 	  /* Not thread-safe, but doesn't matter if we print the warning twice
 	   */
-	  static gboolean warned = FALSE; 
+	  static gboolean warned = FALSE;
 	  if (!warned)
 	    {
 	      warned = TRUE;
 	      _g_fprintf (stderr, "GLib: Cannot convert message: %s\n", err->message);
 	    }
 	  g_error_free (err);
-	  
+
 	  return g_strdup (string);
 	}
     }
@@ -701,14 +701,14 @@ format_unsigned (gchar  *buf,
       *buf = '\000';
       return;
     }
-  
+
   if (!num)
     {
       *buf++ = '0';
       *buf = '\000';
       return;
-    } 
-  
+    }
+
   if (radix == 16)
     {
       *buf++ = '0';
@@ -718,7 +718,7 @@ format_unsigned (gchar  *buf,
     {
       *buf++ = '0';
     }
-	
+
   n = 0;
   tmp = num;
   while (tmp)
@@ -746,7 +746,7 @@ format_unsigned (gchar  *buf,
 	buf[i] = c + 'a' - 10;
       num /= radix;
     }
-  
+
   buf[n] = '\000';
 }
 
@@ -870,16 +870,16 @@ escape_string (GString *string)
   while (p < string->str + string->len)
     {
       gboolean safe;
-	    
+
       wc = g_utf8_get_char_validated (p, -1);
-      if (wc == (gunichar)-1 || wc == (gunichar)-2)  
+      if (wc == (gunichar)-1 || wc == (gunichar)-2)
 	{
 	  gchar *tmp;
 	  guint pos;
 
 	  pos = p - string->str;
 
-	  /* Emit invalid UTF-8 as hex escapes 
+	  /* Emit invalid UTF-8 as hex escapes
            */
 	  tmp = g_strdup_printf ("\\x%02x", (guint)(guchar)*p);
 	  g_string_erase (string, pos, 1);
@@ -898,18 +898,18 @@ escape_string (GString *string)
 	{
 	  safe = CHAR_IS_SAFE (wc);
 	}
-      
+
       if (!safe)
 	{
 	  gchar *tmp;
 	  guint pos;
 
 	  pos = p - string->str;
-	  
+
 	  /* Largest char we escape is 0x0a, so we don't have to worry
 	   * about 8-digit \Uxxxxyyyy
 	   */
-	  tmp = g_strdup_printf ("\\u%04x", wc); 
+	  tmp = g_strdup_printf ("\\u%04x", wc);
 	  g_string_erase (string, pos, g_utf8_next_char (p) - p);
 	  g_string_insert (string, pos, tmp);
 	  g_free (tmp);
@@ -941,7 +941,7 @@ void g_log_default_handler (const gchar   *log_domain,
   else if (log_level & G_LOG_LEVEL_DEBUG)
     pri = ANDROID_LOG_DEBUG;
 
-  __android_log_print (pri, log_domain == NULL ? "GLib-NULL" : log_domain, message);
+  __android_log_print (pri, log_domain == NULL ? "GLib-NULL" : log_domain, "%s", message);
 }
 #else
 void
@@ -975,7 +975,7 @@ g_log_default_handler (const gchar   *log_domain,
   if ((g_log_msg_prefix & log_level) == log_level)
     {
       const gchar *prg_name = g_get_prgname ();
-      
+
       if (!prg_name)
 	g_string_append_printf (gstring, "(process:%lu): ", (gulong)getpid ());
       else
@@ -1027,12 +1027,12 @@ GPrintFunc
 g_set_print_handler (GPrintFunc func)
 {
   GPrintFunc old_print_func;
-  
+
   g_mutex_lock (g_messages_lock);
   old_print_func = glib_print_func;
   glib_print_func = func;
   g_mutex_unlock (g_messages_lock);
-  
+
   return old_print_func;
 }
 
@@ -1043,17 +1043,17 @@ g_print (const gchar *format,
   va_list args;
   gchar *string;
   GPrintFunc local_glib_print_func;
-  
+
   g_return_if_fail (format != NULL);
-  
+
   va_start (args, format);
   string = g_strdup_vprintf (format, args);
   va_end (args);
-  
+
   g_mutex_lock (g_messages_lock);
   local_glib_print_func = glib_print_func;
   g_mutex_unlock (g_messages_lock);
-  
+
   if (local_glib_print_func)
     local_glib_print_func (string);
   else
@@ -1078,12 +1078,12 @@ GPrintFunc
 g_set_printerr_handler (GPrintFunc func)
 {
   GPrintFunc old_printerr_func;
-  
+
   g_mutex_lock (g_messages_lock);
   old_printerr_func = glib_printerr_func;
   glib_printerr_func = func;
   g_mutex_unlock (g_messages_lock);
-  
+
   return old_printerr_func;
 }
 
@@ -1094,17 +1094,17 @@ g_printerr (const gchar *format,
   va_list args;
   gchar *string;
   GPrintFunc local_glib_printerr_func;
-  
+
   g_return_if_fail (format != NULL);
-  
+
   va_start (args, format);
   string = g_strdup_vprintf (format, args);
   va_end (args);
-  
+
   g_mutex_lock (g_messages_lock);
   local_glib_printerr_func = glib_printerr_func;
   g_mutex_unlock (g_messages_lock);
-  
+
   if (local_glib_printerr_func)
     local_glib_printerr_func (string);
   else
@@ -1146,12 +1146,12 @@ gboolean _g_debug_initialized = FALSE;
 guint _g_debug_flags = 0;
 
 void
-_g_debug_init (void) 
+_g_debug_init (void)
 {
   const gchar *val;
-  
+
   _g_debug_initialized = TRUE;
-  
+
   val = g_getenv ("G_DEBUG");
   if (val != NULL)
     {
@@ -1159,23 +1159,23 @@ _g_debug_init (void)
 	{"fatal_warnings", G_DEBUG_FATAL_WARNINGS},
 	{"fatal_criticals", G_DEBUG_FATAL_CRITICALS}
       };
-      
+
       _g_debug_flags = g_parse_debug_string (val, keys, G_N_ELEMENTS (keys));
     }
-  
-  if (_g_debug_flags & G_DEBUG_FATAL_WARNINGS) 
+
+  if (_g_debug_flags & G_DEBUG_FATAL_WARNINGS)
     {
       GLogLevelFlags fatal_mask;
-      
+
       fatal_mask = g_log_set_always_fatal (G_LOG_FATAL_MASK);
       fatal_mask |= G_LOG_LEVEL_WARNING | G_LOG_LEVEL_CRITICAL;
       g_log_set_always_fatal (fatal_mask);
     }
-  
-  if (_g_debug_flags & G_DEBUG_FATAL_CRITICALS) 
+
+  if (_g_debug_flags & G_DEBUG_FATAL_CRITICALS)
     {
       GLogLevelFlags fatal_mask;
-      
+
       fatal_mask = g_log_set_always_fatal (G_LOG_FATAL_MASK);
       fatal_mask |= G_LOG_LEVEL_CRITICAL;
       g_log_set_always_fatal (fatal_mask);
